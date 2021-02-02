@@ -44,11 +44,11 @@ class PlayerActivity : AppCompatActivity() {
             val binder = service as PlayerService.PlayerServiceBinder
             playerService = binder.playerService
 
-            binding.playerView.player = binder.player
+            binding.playerView.player = binder.exoplayer
             binding.titleTV.text =
-                binder.player.currentMediaItem?.mediaId ?: getString(R.string.empty_title)
+                binder.exoplayer.currentMediaItem?.mediaId ?: getString(R.string.empty_title)
 
-            binder.player.addListener(object : Player.EventListener {
+            binder.exoplayer.addListener(object : Player.EventListener {
                 override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
                     binding.titleTV.text = mediaItem?.mediaId ?: getString(R.string.empty_title)
                 }

@@ -18,15 +18,14 @@ class PlayerService : Service() {
     companion object {
         private const val CHANNEL_ID = "player_app_channel"
         private const val NOTIFICATION_ID = 1234
-        private const val REWIND_INCREMENT = 10000L
     }
 
     inner class PlayerServiceBinder : Binder() {
         val playerService
             get() = this@PlayerService
 
-        val player
-            get() = this@PlayerService.player
+        val exoplayer
+            get() = player
     }
 
     override fun onCreate() {
@@ -42,10 +41,8 @@ class PlayerService : Service() {
 
         player.prepare()
 
-        val outsideThis = this
-
         playerNotificationManager = PlayerNotificationManager.createWithNotificationChannel(
-            this,
+            this@PlayerService,
             CHANNEL_ID,
             R.string.channel_name,
             R.string.channel_desc,
@@ -53,9 +50,9 @@ class PlayerService : Service() {
             object : PlayerNotificationManager.MediaDescriptionAdapter {
                 override fun createCurrentContentIntent(player: Player): PendingIntent? {
                     return PendingIntent.getActivity(
-                        outsideThis,
+                        this@PlayerService,
                         0,
-                        Intent(outsideThis, PlayerActivity::class.java),
+                        Intent(this@PlayerService, PlayerActivity::class.java),
                         PendingIntent.FLAG_UPDATE_CURRENT
                     )
                 }
@@ -94,13 +91,6 @@ class PlayerService : Service() {
                     stopSelf()
                 }
             }
-        )
-
-        playerNotificationManager.setControlDispatcher(
-            DefaultControlDispatcher(
-                REWIND_INCREMENT,
-                REWIND_INCREMENT
-            )
         )
         playerNotificationManager.setPlayer(player)
     }
